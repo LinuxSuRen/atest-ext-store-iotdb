@@ -1,0 +1,41 @@
+version: '3.1'
+services:
+  testing:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      iotdb:
+        condition: service_healthy
+      extension:
+        condition: service_started
+    volumes:
+      - type: volume
+        source: cache
+        target: /var/data
+    links:
+      - iotdb
+  extension:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        - "GO_BUILDER=ghcr.io/linuxsuren/library/golang:1.22"
+        - "BASE_IMAGE=ghcr.io/linuxsuren/library/alpine:3.12"
+        - GOPROXY=${GOPROXY}
+
+  iotdb:
+    image: ghcr.io/linuxsuren/apache/iotdb:1.3.2-standalone
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: atest
+    healthcheck:
+      test: ["CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/6667"]
+      interval: 3s
+      timeout: 30s
+      retries: 10
+    ports:
+      - 6667
+volumes:
+  cache:
