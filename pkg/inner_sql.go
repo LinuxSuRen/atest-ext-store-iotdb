@@ -41,8 +41,7 @@ func GetInnerSQL(dialect string) InnerSQL {
 	}
 }
 
-type mysqlDialect struct {
-}
+type mysqlDialect struct{}
 
 func (m *mysqlDialect) ToNativeSQL(query string) (sql string) {
 	if strings.HasPrefix(query, InnerSelectTable_) {
@@ -61,8 +60,7 @@ func (m *mysqlDialect) ToNativeSQL(query string) (sql string) {
 	return
 }
 
-type postgresDialect struct {
-}
+type postgresDialect struct{}
 
 func (p *postgresDialect) ToNativeSQL(query string) (sql string) {
 	if strings.HasPrefix(query, InnerSelectTable_) {
@@ -81,8 +79,7 @@ func (p *postgresDialect) ToNativeSQL(query string) (sql string) {
 	return
 }
 
-type iotdbDialect struct {
-}
+type iotdbDialect struct{}
 
 func (p *iotdbDialect) ToNativeSQL(query string) (sql string) {
 	if strings.HasPrefix(query, InnerSelectTable_) {
@@ -92,7 +89,7 @@ func (p *iotdbDialect) ToNativeSQL(query string) (sql string) {
 	} else if query == InnerShowDatabases {
 		sql = "SHOW DATABASES"
 	} else if query == InnerShowTables {
-		sql = "SELECT * FROM root.*"
+		sql = "show child paths %s"
 	} else if query == InnerCurrentDB {
 		sql = "SELECT CURRENT_STORAGE_GROUP"
 	} else {

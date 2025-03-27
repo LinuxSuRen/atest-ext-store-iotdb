@@ -18,12 +18,13 @@ package pkg
 import (
 	"context"
 	"fmt"
-	"github.com/apache/iotdb-client-go/client"
 	"log"
 	"reflect"
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/apache/iotdb-client-go/client"
 
 	"github.com/linuxsuren/api-testing/pkg/server"
 )
@@ -81,7 +82,6 @@ func (s *dbserver) Query(ctx context.Context, query *server.DataQuery) (result *
 
 func sqlQuery(_ context.Context, sql string, sessionPool *client.SessionPool) (result *server.DataQueryResult, err error) {
 	var session client.Session
-	var timeout int64 = 1000
 	if session, err = sessionPool.GetSession(); err != nil {
 		return
 	}
@@ -89,7 +89,7 @@ func sqlQuery(_ context.Context, sql string, sessionPool *client.SessionPool) (r
 
 	var sessionDataSet *client.SessionDataSet
 	fmt.Println("query sql", sql)
-	if sessionDataSet, err = session.ExecuteQueryStatement(sql, &timeout); err != nil {
+	if sessionDataSet, err = session.ExecuteStatement(sql); err != nil {
 		return
 	}
 
@@ -101,26 +101,7 @@ func sqlQuery(_ context.Context, sql string, sessionPool *client.SessionPool) (r
 
 	columns := sessionDataSet.GetColumnNames()
 	fmt.Println("columns", columns)
-	count := 0
-	for next, nextErr := sessionDataSet.Next(); next; {
-		count++
-		if count > 10 {
-			break
-		}
-		if nextErr != nil {
-			err = nextErr
-			return
-		}
-		// Create a slice of interface{}'s to represent each column,
-		// and a second slice to contain pointers to each item in the columns slice.
-		columnsData := make([]interface{}, len(columns))
-		columnsPointers := make([]interface{}, len(columns))
-		for i := range columnsData {
-			columnsPointers[i] = &columnsData[i]
-		}
-
-		// Scan the result into the column pointers...
-
+	for next, nextErr := sessionDataSet.Next(); next && nextErr == nil; next, nextErr = sessionDataSet.Next() {
 		fmt.Println("get data")
 
 		// Create our map, and retrieve the value for each column from the pointers slice,
@@ -144,7 +125,7 @@ func sqlQuery(_ context.Context, sql string, sessionPool *client.SessionPool) (r
 			}
 
 			rowData.Key = colName
-			fmt.Println(colName)
+			fmt.Println("colName", colName)
 			switch v := val.(type) {
 			case []byte:
 				rowData.Value = string(v)
@@ -177,6 +158,7 @@ func sqlQuery(_ context.Context, sql string, sessionPool *client.SessionPool) (r
 			Data: result.Data,
 		})
 	}
+	fmt.Println(result.Items)
 	return
 }
 
@@ -239,7 +221,7 @@ func (q *commonDataQuery) GetTables(ctx context.Context, currentDatabase string)
 		for _, table := range tableResult.Items {
 			for _, item := range table.GetData() {
 				if item.Key == fmt.Sprintf("Tables_in_%s", currentDatabase) || item.Key == "table_name" ||
-					item.Key == "Tables" || item.Key == "tablename" {
+					item.Key == "Tables" || item.Key == "tablename" || item.Key == "Timeseries" || item.Key == "ChildPaths" {
 					var found bool
 					for _, name := range tables {
 						if name == item.Value {
