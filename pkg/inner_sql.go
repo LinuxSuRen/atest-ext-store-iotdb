@@ -83,9 +83,9 @@ type iotdbDialect struct{}
 
 func (p *iotdbDialect) ToNativeSQL(query string) (sql string) {
 	if strings.HasPrefix(query, InnerSelectTable_) {
-		sql = `SELECT * FROM "` + strings.ReplaceAll(query, InnerSelectTable_, "") + `"`
+		sql = `SELECT * FROM ` + strings.ReplaceAll(query, InnerSelectTable_, "")
 	} else if strings.HasPrefix(query, InnerSelectTableLimit_) {
-		sql = `SELECT * FROM "` + strings.ReplaceAll(query, InnerSelectTableLimit_, "") + `" LIMIT 100`
+		sql = `SELECT * FROM ` + strings.ReplaceAll(query, InnerSelectTableLimit_, "") + ` LIMIT 100`
 	} else if query == InnerShowDatabases {
 		sql = "SHOW DATABASES"
 	} else if query == InnerShowTables {
