@@ -55,6 +55,6 @@ items:
       X-Store-Name: "{{.param.store}}"
     body: |
       {
-        "sql": "",
+        "sql": "show databases",
         "key": ""
       }
