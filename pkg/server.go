@@ -41,7 +41,7 @@ func NewRemoteServer(defaultHistoryLimit int) (s remote.LoaderServer) {
 	return
 }
 
-func (s *dbserver) getClientWithDatabase(ctx context.Context, dbName string) (dbQuery DataQuery, err error) {
+func (s *dbserver) getClientWithDatabase(ctx context.Context) (dbQuery DataQuery, err error) {
 	store := remote.GetStoreFromContext(ctx)
 	if store == nil {
 		err = errors.New("no connect to database")
@@ -56,11 +56,13 @@ func (s *dbserver) getClientWithDatabase(ctx context.Context, dbName string) (db
 			}
 		}
 
+		timezone := store.Properties["timezone"]
 		config := &client.PoolConfig{
 			Host:     host,
 			Port:     port,
 			UserName: store.Username,
 			Password: store.Password,
+			TimeZone: timezone,
 		}
 		sessionPool := client.NewSessionPool(config, 3, 60000, 60000, false)
 

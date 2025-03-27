@@ -32,7 +32,7 @@ import (
 func (s *dbserver) Query(ctx context.Context, query *server.DataQuery) (result *server.DataQueryResult, err error) {
 	var db *client.SessionPool
 	var dbQuery DataQuery
-	if dbQuery, err = s.getClientWithDatabase(ctx, query.Key); err != nil {
+	if dbQuery, err = s.getClientWithDatabase(ctx); err != nil {
 		return
 	}
 
@@ -100,10 +100,7 @@ func sqlQuery(_ context.Context, sql string, sessionPool *client.SessionPool) (r
 	}
 
 	columns := sessionDataSet.GetColumnNames()
-	fmt.Println("columns", columns)
 	for next, nextErr := sessionDataSet.Next(); next && nextErr == nil; next, nextErr = sessionDataSet.Next() {
-		fmt.Println("get data")
-
 		// Create our map, and retrieve the value for each column from the pointers slice,
 		// storing it in the map with the name of the column as the key.
 		for _, colName := range columns {
@@ -120,12 +117,8 @@ func sqlQuery(_ context.Context, sql string, sessionPool *client.SessionPool) (r
 					break
 				}
 			}
-			if val == nil {
-				continue
-			}
 
 			rowData.Key = colName
-			fmt.Println("colName", colName)
 			switch v := val.(type) {
 			case []byte:
 				rowData.Value = string(v)
@@ -158,7 +151,6 @@ func sqlQuery(_ context.Context, sql string, sessionPool *client.SessionPool) (r
 			Data: result.Data,
 		})
 	}
-	fmt.Println(result.Items)
 	return
 }
 
