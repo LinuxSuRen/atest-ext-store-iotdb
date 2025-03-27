@@ -208,8 +208,10 @@ func TestConvertToDBHistoryTestResult(t *testing.T) {
 	})
 }
 
-var now = time.Now().UTC()
-var nowString = now.Format("2006-01-02T15:04:05.999999999")
+var (
+	now       = time.Now().UTC()
+	nowString = now.Format("2006-01-02T15:04:05.999999999")
+)
 
 func TestConvertToRemoteHistoryTestResult(t *testing.T) {
 	assert.Equal(t, &server.HistoryTestResult{
