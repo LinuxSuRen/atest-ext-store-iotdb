@@ -37,7 +37,7 @@ func TestRootCommand(t *testing.T) {
 	t.Run("invalid port", func(t *testing.T) {
 		c := NewRootCommand()
 		c.SetOut(io.Discard)
-		assert.Equal(t, "atest-store-orm", c.Use)
+		assert.Equal(t, "atest-store-iotdb", c.Use)
 
 		c.SetArgs([]string{"--port", "abc"})
 		err := c.Execute()
