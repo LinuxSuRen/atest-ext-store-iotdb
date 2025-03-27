@@ -24,7 +24,7 @@ import (
 
 func NewRootCommand() (c *cobra.Command) {
 	opt := &option{
-		Extension: ext.NewExtension("orm", "store", 7071),
+		Extension: ext.NewExtension("iotdb", "store", 7071),
 	}
 	c = &cobra.Command{
 		Use:   opt.GetFullName(),
