@@ -5,7 +5,7 @@ go 1.22.4
 toolchain go1.23.7
 
 require (
-	github.com/apache/iotdb-client-go v1.3.3
+	github.com/apache/iotdb-client-go v1.3.3-0.20250328040611-553bcc5f79bb
 	github.com/linuxsuren/api-testing v0.0.20-0.20250324072618-12a0db899eb7
 	github.com/spf13/cobra v1.9.1
 	github.com/stretchr/testify v1.9.0
